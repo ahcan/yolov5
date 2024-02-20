@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ksport2-dev
+  namespace: logo-detect
+spec:
+  type: ClusterIP
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  selector:
+    app: ksport2-dev # label selectors Pod
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ksport2-dev
+  namespace: logo-detect
+spec:
+  selector:
+    matchLabels:
+      app: ksport2-dev
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: ksport2-dev
+      annotations:
+        k8s.v1.cni.cncf.io/networks: kube-system/udp-multicast-conf@vlan320
+    spec:
+      nodeSelector:
+        heavy: "1"
+      containers:
+      - name: ksport2-dev
+        image: 172.27.223.7:32000/logodetect:dev
+        imagePullPolicy: Always
+        args:
+          - python3
+          - detectUDP.py
+          - --weights
+          - weights/best-i472-epoch300-batch4.dev
+          - --source
+          - udp://225.1.9.234:8990
+          - --nosave
+        volumeMounts:
+        - name: source-claim
+          mountPath: /usr/src/app
+        resources:
+          requests:
+            memory: "500Mi"
+            cpu: "1"
+          limits:
+            memory: "1Gi"
+            cpu: "2"
+      volumes:
+      - name: source-claim
+        persistentVolumeClaim:
+          claimName: logo-detect-claim

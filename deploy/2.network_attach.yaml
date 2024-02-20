@@ -1,0 +1,22 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: vlan300-multicast
+  namespace: kube-system
+spec:
+  config: '{
+      "cniVersion": "0.3.0",
+      "type": "macvlan",
+      "master": "vlan300",
+      "mode": "bridge",
+      "ipam": {
+        "type": "host-local",
+        "subnet": "10.0.1.0/24",
+        "rangeStart": "10.0.1.13",
+        "rangeEnd": "10.0.1.254",
+        "routes": [
+          { "dst": "239.80.0.0/16" }
+        ],
+        "gateway": "10.0.1.1"
+      }
+    }'
