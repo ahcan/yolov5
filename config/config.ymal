@@ -1,0 +1,10 @@
+RabbitHost:
+  Host: 
+   -
+   - 
+  Port: 
+  User: monitor
+  Pass: 
+  Exchange: direct_alarm
+  RouteKey:
+    LogoDetect: g2DJ9BfZPOkeo18N
